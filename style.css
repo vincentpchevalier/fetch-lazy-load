@@ -79,6 +79,8 @@ main {
 	flex-direction: column;
 	justify-content: stretch;
 
+	position: relative;
+
 	.content {
 		flex: 1;
 	}
@@ -156,6 +158,31 @@ main {
 	background-color: rgba(255, 245, 238, 0.5);
 }
 
+.snackbar {
+	opacity: 0;
+	width: 100%;
+	transform: translateY(0);
+	background-color: #444;
+	color: gold;
+	text-align: center;
+	padding: 2rem;
+	position: fixed;
+	z-index: 1;
+	bottom: 0;
+	transition: transform 1s ease-in-out, opacity 500ms ease;
+	border-top: 0.1rem solid #777;
+
+	.snackbar-content p {
+		margin: 0;
+		font-size: 1.4rem;
+	}
+}
+
+.snackbar.show {
+	opacity: 1;
+	transform: translateY(-8%);
+}
+
 @media only screen and (min-width: 45rem) {
 	main {
 		margin: 0 auto;
@@ -174,5 +201,31 @@ main {
 			rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
 		border: 0.2rem solid rgb(240, 240, 240, 1);
 		border-radius: 0.4rem;
+	}
+
+	.snackbar {
+		opacity: 1;
+		min-width: 50rem;
+		margin-left: -25rem;
+		transform: translateY(0);
+		background-color: #444;
+		color: gold;
+		text-align: center;
+		border-radius: 0.2rem;
+		padding: 2rem;
+		position: fixed;
+		z-index: 1;
+		left: 50%;
+		bottom: 3rem;
+		transition: transform 1s ease-in-out, opacity 500ms ease;
+
+		.snackbar-content p {
+			margin: 0;
+		}
+	}
+
+	.snackbar.show {
+		opacity: 1;
+		/* transform: translateY(-100%); */
 	}
 }

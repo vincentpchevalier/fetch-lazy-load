@@ -1,12 +1,21 @@
 // Global variables
 const userData = []; // Single source of truth
-let scrollMode = true;
+let scrollMode = false;
 let footerObserver;
 
 const footer = document.querySelector('footer');
 
 async function init() {
 	console.log('App initialized, fetching users...');
+
+	// setTimeout(() => {
+	// 	document.querySelector('.snackbar').classList.add('show');
+	// 	console.log('showing snackbar');
+	// 	setTimeout(() => {
+	// 		document.querySelector('.snackbar').classList.remove('show');
+	// 		console.log('hiding snackbar');
+	// 	}, 5000);
+	// }, 5000);
 
 	// Intersection Observer API - setup footer observer
 	const options = {
@@ -16,7 +25,7 @@ async function init() {
 	};
 
 	footerObserver = new IntersectionObserver(revealMoreUsers, options);
-	footerObserver.observe(footer);
+	// footerObserver.observe(footer);
 
 	// Event listener for the toggle scroll mode button
 	document
@@ -35,7 +44,7 @@ async function init() {
 	// Fetch users
 	const newUsers = await fetchUsers();
 	userData.push(...newUsers);
-	loadUsers(userData);
+	// loadUsers(userData);
 }
 
 function toggleScrollMode() {

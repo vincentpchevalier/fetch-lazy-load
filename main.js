@@ -78,7 +78,7 @@ function loadUsers(users) {
 	console.log(content);
 	users.forEach((user) => {
 		const card = document.createElement('div');
-		card.classList.add('card');
+		card.classList.add('card', 'card--loading');
 		card.innerHTML = `
       <img
 				src="${user.avatar}"
@@ -92,6 +92,11 @@ function loadUsers(users) {
       </div>
 	      `;
 		content.appendChild(card);
+	});
+	document.querySelectorAll('.card--loading img').forEach((img) => {
+		img.addEventListener('load', () => {
+			img.closest('.card').classList.remove('card--loading');
+		});
 	});
 }
 

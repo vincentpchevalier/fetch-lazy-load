@@ -8,14 +8,14 @@ const footer = document.querySelector('footer');
 async function init() {
 	console.log('App initialized, fetching users...');
 
-	// setTimeout(() => {
-	// 	document.querySelector('.snackbar').classList.add('show');
-	// 	console.log('showing snackbar');
-	// 	setTimeout(() => {
-	// 		document.querySelector('.snackbar').classList.remove('show');
-	// 		console.log('hiding snackbar');
-	// 	}, 5000);
-	// }, 5000);
+	setTimeout(() => {
+		document.querySelector('.snackbar').classList.add('show');
+		console.log('showing snackbar');
+		setTimeout(() => {
+			document.querySelector('.snackbar').classList.remove('show');
+			console.log('hiding snackbar');
+		}, 5000);
+	}, 2000);
 
 	// Intersection Observer API - setup footer observer
 	const options = {

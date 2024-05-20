@@ -178,6 +178,10 @@ main {
 	}
 }
 
+.error {
+	color: coral;
+}
+
 .snackbar.show {
 	opacity: 1;
 	transform: translateY(-8%);
@@ -204,7 +208,8 @@ main {
 	}
 
 	.snackbar {
-		opacity: 1;
+		opacity: 0;
+		width: initial;
 		min-width: 50rem;
 		margin-left: -25rem;
 		transform: translateY(0);
@@ -226,6 +231,6 @@ main {
 
 	.snackbar.show {
 		opacity: 1;
-		/* transform: translateY(-100%); */
+		transform: translateY(-100%);
 	}
 }

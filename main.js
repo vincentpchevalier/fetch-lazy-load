@@ -1,10 +1,41 @@
-const userData = [];
+// Global variables
+const userData = []; // Single source of truth
+const footer = document.querySelector('footer');
 
 async function init() {
 	console.log('App initialized');
 	const users = await fetchUsers();
 	userData.push(...users);
 	loadUsers(userData);
+	console.log(userData);
+
+	// Intersection Observer API
+	const options = {
+		root: null,
+		rootMargin: '0px',
+		threshold: 0.15,
+	};
+
+	const footerObserver = new IntersectionObserver(revealMoreUsers, options);
+	footerObserver.observe(footer);
+}
+
+function revealMoreUsers(entries) {
+	console.warn('Reached the footer');
+	const [entry] = entries;
+	console.log(entry);
+
+	if (!entry.isIntersecting) return; // Guard clause
+
+	if (userData.length <= 90) {
+		console.log('Fetching more users');
+		fetchUsers(10).then((users) => {
+			userData.push(...users);
+			loadUsers(users);
+		});
+	} else {
+		console.log("That's the max number of users we can fetch at this time.");
+	}
 }
 
 async function fetchUsers(size = 30) {
@@ -26,7 +57,6 @@ async function fetchUsers(size = 30) {
 }
 
 function loadUsers(users) {
-	console.log(users);
 	const content = document.querySelector('.content');
 	console.log(content);
 	users.forEach((user) => {

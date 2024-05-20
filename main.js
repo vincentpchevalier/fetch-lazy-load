@@ -1,5 +1,35 @@
-function init() {
+const userData = [];
+
+async function init() {
 	console.log('App initialized');
+	const users = await fetchUsers();
+	userData.push(...users);
+	loadUsers(userData);
+}
+
+async function fetchUsers(size = 30) {
+	const url = `https://random-data-api.com/api/v2/users?size=${size}`;
+	const response = await fetch(url);
+	const data = await response.json();
+	const users = data.map(({ id, first_name, last_name, username, email }) => {
+		return { id, name: `${first_name} ${last_name}`, username, email };
+	});
+	return users;
+}
+
+function loadUsers(users) {
+	console.log(users);
+	// const container = document.querySelector('.container');
+	// users.forEach((user) => {
+	// 	const card = document.createElement('div');
+	// 	card.classList.add('card');
+	// 	card.innerHTML = `
+	//           <h2>${user.name}</h2>
+	//           <p>${user.username}</p>
+	//           <p>${user.email}</p>
+	//       `;
+	// 	container.appendChild(card);
+	// });
 }
 
 // 1. On page load, fetch the data from the API : https://random-data-api.com/api/v2/users?size=${size}

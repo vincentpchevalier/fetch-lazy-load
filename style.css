@@ -39,6 +39,7 @@ dd {
 
 h1 {
 	font-size: 3.6rem;
+	margin: 0;
 }
 
 a {
@@ -63,11 +64,13 @@ header,
 footer {
 	background-color: #333;
 	color: #fff;
+	padding: 2rem;
 }
 
-header,
-footer {
-	padding: 2rem;
+header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 }
 
 main {
@@ -100,6 +103,18 @@ main {
 	&:hover,
 	&:focus-visible {
 		background-color: #aaa;
+	}
+}
+
+.btn.btn--light {
+	background-color: #fff;
+	color: #333;
+	transition: all 0.2s ease;
+
+	&:hover,
+	&:focus-visible {
+		background-color: #dadada;
+		color: #584c2a;
 	}
 }
 

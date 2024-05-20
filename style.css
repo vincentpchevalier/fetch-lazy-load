@@ -37,12 +37,37 @@ dd {
 	margin: 0 0 1.6rem;
 }
 
+h1 {
+	font-size: 3.6rem;
+}
+
+a {
+	color: snow;
+	transition: all 0.2s ease;
+
+	&:hover {
+		color: #a1a1a1;
+	}
+}
+
+ul {
+	padding: 0;
+}
+
+ul li {
+	list-style: none;
+	padding: 0;
+}
+
 header,
-footer,
-main {
-	width: 90vw;
-	margin: 0 auto;
-	padding: 3rem 0;
+footer {
+	background-color: #333;
+	color: #fff;
+}
+
+header,
+footer {
+	padding: 2rem;
 }
 
 main {
@@ -58,15 +83,74 @@ main {
 	.more {
 		justify-self: flex-end;
 		flex: 0;
+		padding: 2rem;
+		margin: 0 auto;
+	}
+}
+
+.btn {
+	background-color: #333;
+	color: #fff;
+	border: none;
+	padding: 1rem 2rem;
+	border-radius: 0.4rem;
+	cursor: pointer;
+	transition: all 0.2s ease;
+
+	&:hover,
+	&:focus-visible {
+		background-color: #aaa;
+	}
+}
+
+.card {
+	padding: 1rem;
+	background-color: #fff;
+	background-color: rgba(255, 245, 238, 1);
+	border-bottom: 0.2rem solid rgba(0, 0, 0, 0.1);
+	border-radius: none;
+
+	box-shadow: none;
+
+	display: flex;
+	gap: 1.6rem;
+	align-items: center;
+
+	.card__img {
+		width: 10rem;
+		margin-right: 1.6rem;
+		background-color: rgba(182, 186, 141, 0.2);
+		border-radius: 50%;
+		border: 0.2rem solid rgba(188, 188, 188, 0.4);
+	}
+
+	.card__content > * {
+		margin: 0;
+	}
+
+	.card__content h2 {
+		font-size: 2rem;
+		color: #0a3e1a;
 	}
 }
 
 @media only screen and (min-width: 45rem) {
-	header,
-	footer,
 	main {
-		width: 60vw;
 		margin: 0 auto;
-		padding: 3rem 0;
+		padding: 2rem 0;
+
+		.more {
+			padding: 2rem 0;
+			margin: 0;
+		}
+	}
+
+	.card {
+		padding: 2rem;
+		margin-bottom: 2rem;
+		box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px,
+			rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
+		border: 0.2rem solid rgb(240, 240, 240, 1);
+		border-radius: 0.4rem;
 	}
 }

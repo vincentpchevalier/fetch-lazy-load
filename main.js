@@ -18,13 +18,23 @@ async function init() {
 	footerObserver = new IntersectionObserver(revealMoreUsers, options);
 	footerObserver.observe(footer);
 
+	// Event listener for the toggle scroll mode button
 	document
 		.getElementById('toggle-scroll-mode')
 		.addEventListener('click', toggleScrollMode);
 
+	// Event listener for the load more button
+	document.getElementById('load-more').addEventListener('click', () => {
+		// Unlike with the observer, we will just use the fetchUsers function to fetch more users
+		fetchUsers(10).then((users) => {
+			userData.push(...users);
+			loadUsers(users);
+		});
+	});
+
 	// Fetch users
-	const users = await fetchUsers();
-	userData.push(...users);
+	const newUsers = await fetchUsers();
+	userData.push(...newUsers);
 	loadUsers(userData);
 }
 
@@ -39,11 +49,13 @@ function toggleScrollMode() {
 
 function revealMoreUsers(entries) {
 	console.warn('Reached the footer, loading more users...');
-	const [entry] = entries;
-	console.log(entry);
+	const [entry] = entries; // passed to this function from the observer callback function
+	console.log(entries); // Array of IntersectionObserverEntry objects - footer will be the entry at index 0 in this case because we are observing only one element
+	console.log(entry); // IntersectionObserverEntry object
 
 	if (!entry.isIntersecting) return; // Guard clause
 
+	// Fetch more users but limit the number of users to 90 because we don't want to overload our fetch requests to a free API (Error 429 - Too Many Requests)
 	if (userData.length <= 90) {
 		console.log('Fetching more users');
 		fetchUsers(10).then((users) => {
@@ -79,6 +91,7 @@ function loadUsers(users) {
 	users.forEach((user) => {
 		const card = document.createElement('div');
 		card.classList.add('card', 'card--loading');
+		card.dataset.id = user.id;
 		card.innerHTML = `
       <img
 				src="${user.avatar}"
@@ -93,6 +106,7 @@ function loadUsers(users) {
 	      `;
 		content.appendChild(card);
 	});
+	// Remove the loading class once the images have loaded
 	document.querySelectorAll('.card--loading img').forEach((img) => {
 		img.addEventListener('load', () => {
 			img.closest('.card').classList.remove('card--loading');
@@ -105,7 +119,7 @@ function loadUsers(users) {
 // 3. Each card should have the following details: Name (first_name + last_name), username, email, avatar, and an id.
 // 4. As the user scrolls down, fetch 10 more users and display them in the UI. Use observer to detect when the user has scrolled to the bottom of the page. Only display the cards once their avatars have been loaded.
 // 5. Show an empty flashing card animation as a loading animation at the bottom of the page when the user scrolls down and the data is being fetched.
-// 6. When the user clicks on the Load Manually, turn off the auto loading of users when the user scrolls down. Show the Load More button at the bottom of the page. When the user clicks on the Load More button, fetch the next 30 users and display them in the UI.
+// 6. When the user clicks on the Load Manually, turn off the auto loading of users when the user scrolls down. Show the Load More button at the bottom of the page. When the user clicks on the Load More button, fetch the next 10 users and display them in the UI.
 // 7. Create a custom error handling mechanism to handle the API errors. Extend the Error class and create a custom error class. Use this custom error class to handle the API errors.
 // 8. Show a toast message at the top of the page when an error occurs. Include a button to dismiss the toast message. Include a "Try Again" button in the toast message. When the user clicks on the "Try Again" button, retry the API call.
 

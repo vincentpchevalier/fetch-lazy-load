@@ -1,27 +1,44 @@
 // Global variables
 const userData = []; // Single source of truth
+let scrollMode = true;
+let footerObserver;
+
 const footer = document.querySelector('footer');
 
 async function init() {
-	console.log('App initialized');
-	const users = await fetchUsers();
-	userData.push(...users);
-	loadUsers(userData);
-	console.log(userData);
+	console.log('App initialized, fetching users...');
 
-	// Intersection Observer API
+	// Intersection Observer API - setup footer observer
 	const options = {
 		root: null,
 		rootMargin: '0px',
 		threshold: 0.15,
 	};
 
-	const footerObserver = new IntersectionObserver(revealMoreUsers, options);
+	footerObserver = new IntersectionObserver(revealMoreUsers, options);
 	footerObserver.observe(footer);
+
+	document
+		.getElementById('toggle-scroll-mode')
+		.addEventListener('click', toggleScrollMode);
+
+	// Fetch users
+	const users = await fetchUsers();
+	userData.push(...users);
+	loadUsers(userData);
+}
+
+function toggleScrollMode() {
+	scrollMode = !scrollMode;
+	console.log('scrollMode:', scrollMode);
+
+	scrollMode
+		? footerObserver.observe(footer)
+		: footerObserver.unobserve(footer);
 }
 
 function revealMoreUsers(entries) {
-	console.warn('Reached the footer');
+	console.warn('Reached the footer, loading more users...');
 	const [entry] = entries;
 	console.log(entry);
 
@@ -81,7 +98,7 @@ function loadUsers(users) {
 // 1. On page load, fetch the data from the API : https://random-data-api.com/api/v2/users?size=${size}
 // 2. Retrieve 30 users from the API, display them as cards in the UI
 // 3. Each card should have the following details: Name (first_name + last_name), username, email, avatar, and an id.
-// 4. As the user scrolls down, fetch the next 30 users and display them in the UI. Use observer to detect when the user has scrolled to the bottom of the page. Only display the cards once their avatars have been loaded.
+// 4. As the user scrolls down, fetch 10 more users and display them in the UI. Use observer to detect when the user has scrolled to the bottom of the page. Only display the cards once their avatars have been loaded.
 // 5. Show an empty flashing card animation as a loading animation at the bottom of the page when the user scrolls down and the data is being fetched.
 // 6. When the user clicks on the Load Manually, turn off the auto loading of users when the user scrolls down. Show the Load More button at the bottom of the page. When the user clicks on the Load More button, fetch the next 30 users and display them in the UI.
 // 7. Create a custom error handling mechanism to handle the API errors. Extend the Error class and create a custom error class. Use this custom error class to handle the API errors.

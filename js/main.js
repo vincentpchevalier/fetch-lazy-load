@@ -3,9 +3,8 @@ import NetworkError from './utils.js';
 // Global variables
 const userData = []; // Single source of truth
 const maxUsers = 30; // Max number of users we can fetch
-let scrollMode = true;
-
-// Intersection Observer API
+let scrollMode = true; // Lazy load scroll mode is enabled by default
+let maxUsersReached;
 let footerObserver;
 
 const options = {
@@ -31,7 +30,6 @@ function init() {
 
 	// Event listener for the load more button
 	loadMoreBtn.addEventListener('click', () => {
-		// Unlike with the observer, we will just use the fetchUsers function to fetch more users
 		fetchUsers(10);
 	});
 
@@ -40,8 +38,8 @@ function init() {
 }
 
 async function fetchUsers(size = 20) {
-	let maxUsersReached = userData.length >= maxUsers;
-	console.log('max users:', maxUsers, 'maxUsersReached:', maxUsersReached);
+	maxUsersReached = userData.length >= maxUsers;
+	// console.log('max users:', maxUsers, 'maxUsersReached:', maxUsersReached); // Debugging to keep track of the max users and if we've reached the limit
 
 	const url = `https://random-data-api.com/api/v2/users?size=${size}`;
 
@@ -70,7 +68,7 @@ async function fetchUsers(size = 20) {
 			userData.push(...users);
 		} catch (err) {
 			if (err instanceof NetworkError) {
-				if (userData.length === 0) showSnackbar(err.message);
+				showSnackbar(err.message);
 			} else {
 				showSnackbar('An error occurred. Please try again.');
 			}
@@ -81,6 +79,8 @@ async function fetchUsers(size = 20) {
 			`That's the max number of users we can fetch at this time.`,
 			'success'
 		);
+
+		// Disable the load more button
 		loadMoreBtn.disabled = true;
 		loadMoreBtn.classList.add('btn--disabled');
 	}
@@ -88,6 +88,7 @@ async function fetchUsers(size = 20) {
 
 function loadUsers(users) {
 	const content = document.querySelector('.content');
+
 	users.forEach((user) => {
 		const card = document.createElement('div');
 		card.classList.add('card', 'card--loading');
@@ -106,6 +107,7 @@ function loadUsers(users) {
 	      `;
 		content.appendChild(card);
 	});
+
 	// Remove the loading class once the images have loaded
 	document.querySelectorAll('.card--loading img').forEach((img) => {
 		img.addEventListener('load', () => {
@@ -128,7 +130,7 @@ function revealMoreUsers(entries) {
 
 function toggleScrollMode() {
 	scrollMode = !scrollMode;
-	console.log('scrollMode:', scrollMode);
+	// console.log('scrollMode:', scrollMode);
 
 	// Show message in snackbar about the scroll mode
 	showSnackbar(
@@ -138,8 +140,9 @@ function toggleScrollMode() {
 
 	// Disable the load more button when scroll mode is enabled and we've reached the max number of users
 	loadMoreBtn.disabled = scrollMode && userData.length >= maxUsers; // && is a short-circuit operator that only evaluates the second expression if the first one is true
-	loadMoreBtn.classList.toggle('btn--disabled', !scrollMode || maxUsersReached); // second argument is a boolean that determines whether the class should be added or removed
+	loadMoreBtn.classList.toggle('btn--disabled', scrollMode || maxUsersReached); // second argument is a boolean that determines whether the class should be added or removed
 
+	// Toggle the observer based on the scroll mode
 	scrollMode
 		? footerObserver.observe(footer)
 		: footerObserver.unobserve(footer);
@@ -168,6 +171,6 @@ function showSnackbar(message, type = 'error') {
 // 5. Show an empty flashing card animation as a loading animation at the bottom of the page when the user scrolls down and the data is being fetched.
 // 6. When the user clicks on the Load Manually, turn off the auto loading of users when the user scrolls down. Show the Load More button at the bottom of the page. When the user clicks on the Load More button, fetch the next 10 users and display them in the UI.
 // 7. Create a custom error handling mechanism to handle the API errors. Extend the Error class and create a custom error class. Use this custom error class to handle the API errors.
-// 8. Show a snackbar message at the bottom of the page when an error occurs. The snackbar should show the error message and disappear after 5 seconds.
+// 8. Show a snackbar message at the bottom of the page when an error occurs or the state of the page changes. The snackbar should show the error message and disappear after a few seconds.
 
 document.addEventListener('DOMContentLoaded', init);

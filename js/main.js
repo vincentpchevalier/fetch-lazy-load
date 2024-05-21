@@ -2,7 +2,7 @@ import NetworkError from './utils.js';
 
 // Global variables
 const userData = []; // Single source of truth
-const maxUsers = 50; // Max number of users we can fetch
+const maxUsers = 30; // Max number of users we can fetch
 let scrollMode = true;
 
 // Intersection Observer API

@@ -38,8 +38,17 @@ dd {
 }
 
 h1 {
-	font-size: 3.6rem;
+	font-size: clamp(3rem, 5vw, 4rem);
 	margin: 0;
+}
+
+h2 {
+	font-size: clamp(1.8rem, 4vw, 3rem);
+}
+
+p {
+	font-size: clamp(1.4rem, 2vw, 2rem);
+	line-height: clamp(2rem, 2vw, 3.5rem);
 }
 
 a {
@@ -69,8 +78,10 @@ footer {
 
 header {
 	display: flex;
+	flex-direction: column;
 	justify-content: space-between;
 	align-items: center;
+	gap: 1rem;
 }
 
 main {
@@ -96,8 +107,9 @@ main {
 .btn {
 	background-color: #333;
 	color: #fff;
+	font-size: clamp(1.6rem, 2vw, 2rem);
 	border: none;
-	padding: 1rem 2rem;
+	padding: 0.75rem 1.5rem;
 	border-radius: 0.4rem;
 	cursor: pointer;
 	transition: all 0.2s ease;
@@ -121,7 +133,7 @@ main {
 }
 
 .card {
-	padding: 1rem;
+	padding: 2rem 4rem;
 	background-color: #fff;
 	background-color: rgba(255, 245, 238, 1);
 	border-bottom: 0.2rem solid rgba(0, 0, 0, 0.1);
@@ -148,7 +160,6 @@ main {
 	}
 
 	.card__content h2 {
-		font-size: 2rem;
 		color: #0a3e1a;
 	}
 }
@@ -195,6 +206,13 @@ main {
 }
 
 @media only screen and (min-width: 45rem) {
+	header {
+		display: flex;
+		flex-direction: unset;
+		justify-content: space-between;
+		align-items: center;
+	}
+
 	main {
 		margin: 0 auto;
 		padding: 2rem 0;
@@ -203,6 +221,10 @@ main {
 			padding: 2rem 0;
 			margin: 0;
 		}
+	}
+
+	.btn {
+		padding: 1rem 2rem;
 	}
 
 	.card {

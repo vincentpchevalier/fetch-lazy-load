@@ -2,7 +2,7 @@ import NetworkError from './utils.js';
 
 // Global variables
 const userData = []; // Single source of truth
-const maxUsers = 0; // Max number of users we can fetch
+const maxUsers = 50; // Max number of users we can fetch
 let scrollMode = true;
 
 // Intersection Observer API
@@ -132,9 +132,7 @@ function toggleScrollMode() {
 
 	// Show message in snackbar about the scroll mode
 	showSnackbar(
-		`Scroll mode is ${
-			scrollMode ? 'enabled. Now fetching data.' : 'disabled'
-		}.`,
+		`Scroll mode is ${scrollMode ? 'enabled' : 'disabled'}.`,
 		'success'
 	);
 

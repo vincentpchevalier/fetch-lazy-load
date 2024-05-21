@@ -188,6 +188,12 @@ main {
 	transform: translateY(-8%);
 }
 
+.btn--disabled {
+	background-color: #aaa;
+	color: #fff;
+	cursor: not-allowed;
+}
+
 @media only screen and (min-width: 45rem) {
 	main {
 		margin: 0 auto;

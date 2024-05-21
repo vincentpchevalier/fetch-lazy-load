@@ -8,6 +8,7 @@ let footerObserver;
 const maxUsers = 50; // Max number of users we can fetch
 
 const footer = document.querySelector('footer');
+const loadMoreBtn = document.getElementById('load-more');
 
 function init() {
 	console.log('App initialized, fetching users...');
@@ -20,7 +21,7 @@ function init() {
 	};
 
 	footerObserver = new IntersectionObserver(revealMoreUsers, options);
-	footerObserver.observe(footer);
+	// footerObserver.observe(footer);
 
 	// Event listener for the toggle scroll mode button
 	document
@@ -28,13 +29,13 @@ function init() {
 		.addEventListener('click', toggleScrollMode);
 
 	// Event listener for the load more button
-	document.getElementById('load-more').addEventListener('click', () => {
+	loadMoreBtn.addEventListener('click', () => {
 		// Unlike with the observer, we will just use the fetchUsers function to fetch more users
 		fetchUsers(10);
 	});
 
 	// Fetch users
-	fetchUsers(10);
+	// fetchUsers(10);
 }
 
 async function fetchUsers(size = 20) {
@@ -121,6 +122,12 @@ function toggleScrollMode() {
 	scrollMode = !scrollMode;
 	console.log('scrollMode:', scrollMode);
 
+	// Show message in snackbar about the scroll mode
+
+	// Disable the load more button when scroll mode is enabled and we've reached the max number of users
+	loadMoreBtn.disabled = scrollMode && userData.length >= maxUsers; // && is a short-circuit operator that only evaluates the second expression if the first one is true
+	loadMoreBtn.classList.toggle('btn--disabled', !scrollMode); // second argument is a boolean that determines whether the class should be added or removed
+
 	scrollMode
 		? footerObserver.observe(footer)
 		: footerObserver.unobserve(footer);
@@ -149,6 +156,6 @@ function showSnackbar(message, type = 'error') {
 // 5. Show an empty flashing card animation as a loading animation at the bottom of the page when the user scrolls down and the data is being fetched.
 // 6. When the user clicks on the Load Manually, turn off the auto loading of users when the user scrolls down. Show the Load More button at the bottom of the page. When the user clicks on the Load More button, fetch the next 10 users and display them in the UI.
 // 7. Create a custom error handling mechanism to handle the API errors. Extend the Error class and create a custom error class. Use this custom error class to handle the API errors.
-// 8. Show a toast message at the top of the page when an error occurs. Include a button to dismiss the toast message. Include a "Try Again" button in the toast message. When the user clicks on the "Try Again" button, retry the API call.
+// 8. Show a snackbar message at the bottom of the page when an error occurs. The snackbar should show the error message and disappear after 5 seconds.
 
 document.addEventListener('DOMContentLoaded', init);

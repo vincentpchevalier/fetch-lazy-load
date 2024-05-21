@@ -1,21 +1,25 @@
+import NetworkError from './utils.js';
+
 // Global variables
 const userData = []; // Single source of truth
 let scrollMode = false;
 let footerObserver;
 
+const maxUsers = 50; // Max number of users we can fetch
+
 const footer = document.querySelector('footer');
 
-async function init() {
+function init() {
 	console.log('App initialized, fetching users...');
 
-	setTimeout(() => {
-		document.querySelector('.snackbar').classList.add('show');
-		console.log('showing snackbar');
-		setTimeout(() => {
-			document.querySelector('.snackbar').classList.remove('show');
-			console.log('hiding snackbar');
-		}, 5000);
-	}, 2000);
+	// setTimeout(() => {
+	// 	document.querySelector('.snackbar').classList.add('show');
+	// 	console.log('showing snackbar');
+	// 	setTimeout(() => {
+	// 		document.querySelector('.snackbar').classList.remove('show');
+	// 		console.log('hiding snackbar');
+	// 	}, 5000);
+	// }, 2000);
 
 	// Intersection Observer API - setup footer observer
 	const options = {
@@ -25,7 +29,7 @@ async function init() {
 	};
 
 	footerObserver = new IntersectionObserver(revealMoreUsers, options);
-	// footerObserver.observe(footer);
+	footerObserver.observe(footer);
 
 	// Event listener for the toggle scroll mode button
 	document
@@ -35,68 +39,51 @@ async function init() {
 	// Event listener for the load more button
 	document.getElementById('load-more').addEventListener('click', () => {
 		// Unlike with the observer, we will just use the fetchUsers function to fetch more users
-		fetchUsers(10).then((users) => {
-			userData.push(...users);
-			loadUsers(users);
-		});
+		fetchUsers(10);
 	});
 
 	// Fetch users
-	const newUsers = await fetchUsers();
-	userData.push(...newUsers);
-	// loadUsers(userData);
+	fetchUsers(10);
 }
 
-function toggleScrollMode() {
-	scrollMode = !scrollMode;
-	console.log('scrollMode:', scrollMode);
-
-	scrollMode
-		? footerObserver.observe(footer)
-		: footerObserver.unobserve(footer);
-}
-
-function revealMoreUsers(entries) {
-	console.warn('Reached the footer, loading more users...');
-	const [entry] = entries; // passed to this function from the observer callback function
-	console.log(entries); // Array of IntersectionObserverEntry objects - footer will be the entry at index 0 in this case because we are observing only one element
-	console.log(entry); // IntersectionObserverEntry object
-
-	if (!entry.isIntersecting) return; // Guard clause
-
-	// Fetch more users but limit the number of users to 90 because we don't want to overload our fetch requests to a free API (Error 429 - Too Many Requests)
-	if (userData.length <= 90) {
-		console.log('Fetching more users');
-		fetchUsers(10).then((users) => {
-			userData.push(...users);
-			loadUsers(users);
-		});
-	} else {
-		console.log("That's the max number of users we can fetch at this time.");
-	}
-}
-
-async function fetchUsers(size = 30) {
+async function fetchUsers(size = 20) {
 	const url = `https://random-data-api.com/api/v2/users?size=${size}`;
-	const response = await fetch(url);
-	const data = await response.json();
-	const users = data.map(
-		({ id, avatar, first_name, last_name, username, email }) => {
-			return {
-				id,
-				avatar,
-				name: `${first_name} ${last_name}`,
-				username,
-				email,
-			};
+	try {
+		const response = await fetch(url);
+		console.log(response.ok, response.status, response.statusText);
+		if (!response.ok) {
+			throw new NetworkError(
+				`Response failed with status ${response.status}`,
+				response
+			);
 		}
-	);
-	return users;
+		const data = await response.json();
+		const users = data.map(
+			({ id, avatar, first_name, last_name, username, email }) => {
+				return {
+					id,
+					avatar,
+					name: `${first_name} ${last_name}`,
+					username,
+					email,
+				};
+			}
+		);
+		userData.push(...users);
+	} catch (err) {
+		if (err instanceof NetworkError) {
+			console.log(userData.length);
+			if (userData.length === 0) showSnackbar(err.message);
+		} else {
+			showSnackbar('An error occurred. Please try again.');
+		}
+	}
+	console.log(userData.length);
+	loadUsers(userData);
 }
 
 function loadUsers(users) {
 	const content = document.querySelector('.content');
-	console.log(content);
 	users.forEach((user) => {
 		const card = document.createElement('div');
 		card.classList.add('card', 'card--loading');
@@ -121,6 +108,48 @@ function loadUsers(users) {
 			img.closest('.card').classList.remove('card--loading');
 		});
 	});
+}
+
+function revealMoreUsers(entries) {
+	console.log('Reached the footer, loading more users...');
+	const [entry] = entries; // passed to this function from the observer callback function
+	// console.log(entries); // Array of IntersectionObserverEntry objects - footer will be the entry at index 0 in this case because we are observing only one element
+	// console.log(entry); // IntersectionObserverEntry object
+
+	if (!entry.isIntersecting) return; // Guard clause
+
+	// Fetch more users but limit the number of users to 90 because we don't want to overload our fetch requests to a free API (Error 429 - Too Many Requests)
+	if (userData.length <= maxUsers) {
+		console.log('Fetching more users');
+		fetchUsers(10);
+	} else {
+		console.log("That's the max number of users we can fetch at this time.");
+	}
+}
+
+function toggleScrollMode() {
+	scrollMode = !scrollMode;
+	console.log('scrollMode:', scrollMode);
+
+	scrollMode
+		? footerObserver.observe(footer)
+		: footerObserver.unobserve(footer);
+}
+
+function showSnackbar(message, type = 'error') {
+	// Show snackbar
+	const snackbar = document.querySelector('.snackbar');
+	snackbar.classList.add('show');
+
+	// Set timeout to hide snackbar
+	setTimeout(() => {
+		snackbar.classList.remove('show');
+	}, 5000);
+
+	// Update snackbar message
+	const sbMessage = snackbar.querySelector('.snackbar__message');
+	if (type === 'error') sbMessage.classList.add('error');
+	sbMessage.textContent = message;
 }
 
 // 1. On page load, fetch the data from the API : https://random-data-api.com/api/v2/users?size=${size}

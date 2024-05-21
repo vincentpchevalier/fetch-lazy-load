@@ -164,13 +164,4 @@ function showSnackbar(message, type = 'error') {
 	sbMessage.textContent = message;
 }
 
-// 1. On page load, fetch the data from the API : https://random-data-api.com/api/v2/users?size=${size}
-// 2. Retrieve users from the API. Limit the number of users using a maxUsers variable.
-// 3. Display them as cards in the UI. Each card should have the following details: Name (first_name + last_name), username, email, avatar, and an id.
-// 4. As the user scrolls down, fetch more users and display them in the UI. Use observer to detect when the user has scrolled to the bottom of the page. Only display the cards once their avatars have been loaded.
-// 5. Show an empty flashing card animation as a loading animation at the bottom of the page when the user scrolls down and the data is being fetched.
-// 6. When the user clicks on the Load Manually, turn off the auto loading of users when the user scrolls down. Show the Load More button at the bottom of the page. When the user clicks on the Load More button, fetch the next 10 users and display them in the UI.
-// 7. Create a custom error handling mechanism to handle the API errors. Extend the Error class and create a custom error class. Use this custom error class to handle the API errors.
-// 8. Show a snackbar message at the bottom of the page when an error occurs or the state of the page changes. The snackbar should show the error message and disappear after a few seconds.
-
 document.addEventListener('DOMContentLoaded', init);

@@ -1,176 +1,23 @@
-import NetworkError from './utils.js';
-
-// Global variables
-const userData = []; // Single source of truth
-const maxUsers = 30; // Max number of users we can fetch
-let scrollMode = true; // Lazy load scroll mode is enabled by default
-let maxUsersReached;
-let footerObserver;
-
-const options = {
-	root: null,
-	rootMargin: '0px',
-	threshold: 0.15,
-};
-
-// DOM elements
-const footer = document.querySelector('footer');
-const loadMoreBtn = document.getElementById('load-more');
-const toggleScrollModeBtn = document.getElementById('toggle-scroll-mode');
-
-function init() {
-	console.log('App initialized, fetching users...');
-
-	// Instantiate observer for the footer and start observing
-	footerObserver = new IntersectionObserver(revealMoreUsers, options);
-	footerObserver.observe(footer);
-
-	// Event listener for the toggle scroll mode button
-	toggleScrollModeBtn.addEventListener('click', toggleScrollMode);
-
-	// Event listener for the load more button
-	loadMoreBtn.addEventListener('click', () => {
-		fetchUsers(10);
-	});
-
-	// Fetch users
-	fetchUsers(10);
-}
-
-async function fetchUsers(size = 20) {
-	maxUsersReached = userData.length >= maxUsers;
-	// console.log('max users:', maxUsers, 'maxUsersReached:', maxUsersReached); // Debugging to keep track of the max users and if we've reached the limit
-
-	const url = `https://random-data-api.com/api/v2/users?size=${size}`;
-
-	// Fetch users but limit the number of users to maxUsers because we don't want to overload our fetch requests to a free API (Error 429 - Too Many Requests)
-	if (!maxUsersReached) {
-		try {
-			const response = await fetch(url);
-			if (!response.ok) {
-				throw new NetworkError(
-					`Response failed with status ${response.status}`,
-					response
-				);
-			}
-			const data = await response.json();
-			const users = data.map(
-				({ id, avatar, first_name, last_name, username, email }) => {
-					return {
-						id,
-						avatar,
-						name: `${first_name} ${last_name}`,
-						username,
-						email,
-					};
-				}
-			);
-			userData.push(...users);
-		} catch (err) {
-			if (err instanceof NetworkError) {
-				showSnackbar(err.message);
-			} else {
-				showSnackbar('An error occurred. Please try again.');
-			}
-		}
-		loadUsers(userData);
-	} else {
-		showSnackbar(
-			`That's the max number of users we can fetch at this time.`,
-			'success'
-		);
-
-		// Disable the load more button
-		loadMoreBtn.disabled = true;
-		loadMoreBtn.classList.add('btn--disabled');
-	}
-}
-
-function loadUsers(users) {
-	const content = document.querySelector('.content');
-
-	users.forEach((user) => {
-		const card = document.createElement('div');
-		card.classList.add('card', 'card--loading');
-		card.dataset.id = user.id;
-		card.innerHTML = `
-      <img
-				src="${user.avatar}"
-				alt="avatar"
-				class="card__img"
-			/>
-      <div class="card__content">
-	      <h2>${user.name}</h2>
-	      <p>${user.username}</p>
-	      <p>${user.email}</p>
-      </div>
-	      `;
-		content.appendChild(card);
-	});
-
-	// Remove the loading class once the images have loaded
-	document.querySelectorAll('.card--loading img').forEach((img) => {
-		img.addEventListener('load', () => {
-			img.closest('.card').classList.remove('card--loading');
-		});
-	});
-}
-
-function revealMoreUsers(entries) {
-	console.log('Reached the footer, loading more users...');
-	const [entry] = entries; // passed to this function from the observer callback function
-	// console.log(entries); // Array of IntersectionObserverEntry objects - footer will be the entry at index 0 in this case because we are observing only one element
-	// console.log(entry); // IntersectionObserverEntry object
-
-	if (!entry.isIntersecting) return; // Guard clause
-
-	// Fetch more users
-	if (userData.length !== 0) fetchUsers(10);
-}
-
-function toggleScrollMode() {
-	scrollMode = !scrollMode;
-	// console.log('scrollMode:', scrollMode);
-
-	// Show message in snackbar about the scroll mode
-	showSnackbar(
-		`Scroll mode is ${scrollMode ? 'enabled' : 'disabled'}.`,
-		'success'
-	);
-
-	// Disable the load more button when scroll mode is enabled and we've reached the max number of users
-	loadMoreBtn.disabled = scrollMode && userData.length >= maxUsers; // && is a short-circuit operator that only evaluates the second expression if the first one is true
-	loadMoreBtn.classList.toggle('btn--disabled', scrollMode || maxUsersReached); // second argument is a boolean that determines whether the class should be added or removed
-
-	// Toggle the observer based on the scroll mode
-	scrollMode
-		? footerObserver.observe(footer)
-		: footerObserver.unobserve(footer);
-}
-
-function showSnackbar(message, type = 'error') {
-	// Show snackbar
-	const snackbar = document.querySelector('.snackbar');
-	snackbar.classList.add('show');
-
-	// Set timeout to hide snackbar
-	setTimeout(() => {
-		snackbar.classList.remove('show');
-	}, 5000);
-
-	// Update snackbar message
-	const sbMessage = snackbar.querySelector('.snackbar__message');
-	if (type === 'error') sbMessage.classList.add('error');
-	sbMessage.textContent = message;
-}
-
 // 1. On page load, fetch the data from the API : https://random-data-api.com/api/v2/users?size=${size}
-// 2. Retrieve users from the API. Limit the number of users using a maxUsers variable.
-// 3. Display them as cards in the UI. Each card should have the following details: Name (first_name + last_name), username, email, avatar, and an id.
-// 4. As the user scrolls down, fetch more users and display them in the UI. Use observer to detect when the user has scrolled to the bottom of the page. Only display the cards once their avatars have been loaded.
-// 5. Show an empty flashing card animation as a loading animation at the bottom of the page when the user scrolls down and the data is being fetched.
-// 6. When the user clicks on the Load Manually, turn off the auto loading of users when the user scrolls down. Show the Load More button at the bottom of the page. When the user clicks on the Load More button, fetch the next 10 users and display them in the UI.
-// 7. Create a custom error handling mechanism to handle the API errors. Extend the Error class and create a custom error class. Use this custom error class to handle the API errors.
-// 8. Show a snackbar message at the bottom of the page when an error occurs or the state of the page changes. The snackbar should show the error message and disappear after a few seconds.
+// 2. Retrieve users from the API. Only load the data that you need to display (see next step). Store the data in a users array that will serve as your single source of truth. Limit the number of users using a maxUsers variable.
+// 3. Display the data from your users array as cards in the UI. Each card should have the following details: Name (first_name + last_name), username, email, avatar, and an id. Use this markup for the card. Apply a 'card--loading' class to the card while the avatar is loading. Once the avatar has loaded, remove the 'card--loading' class.
 
-document.addEventListener('DOMContentLoaded', init);
+/* 
+<div class="card">
+	<img
+		src="${user.avatar}"
+		alt="avatar"
+		class="card__img"
+	/>
+  <div class="card__content">
+    <h2>${user.name}</h2>
+    <p>${user.username}</p>
+    <p>${user.email}</p>
+  </div>
+</div>
+*/
+
+// 4. As the user scrolls down, fetch more users and display them in the UI. Use the intersection observer API to detect when the user has scrolled to the bottom of the page. Only display the cards once their avatars have been loaded.
+// 5. When the user clicks on the "toggle-scroll-mode" button (id), turn off the auto loading of users when the user scrolls down. Enable the "load-more" button (id) at the bottom of the page. When the user clicks on the Load More button, fetch the next number of users and display them in the UI as you did in step 3. If the user has reached the max number of users, disable the Load More button and show a message in the snackbar at the bottom of the page.
+// 6. Create a custom error handling mechanism to handle the API errors. Extend the Error class and create a custom error class. Use this custom error class to handle the API errors. Import it into your main.js from a utils.js file.
+// 7. Use the custom error class to handle the API errors and show a snackbar message at the bottom of the page when an error occurs. The snackbar should show the error message and disappear after a few seconds.

@@ -38,8 +38,17 @@ dd {
 }
 
 h1 {
-	font-size: 3.6rem;
+	font-size: clamp(3rem, 5vw, 4rem);
 	margin: 0;
+}
+
+h2 {
+	font-size: clamp(1.8rem, 4vw, 3rem);
+}
+
+p {
+	font-size: clamp(1.4rem, 2vw, 2rem);
+	line-height: clamp(2rem, 2vw, 3.5rem);
 }
 
 a {
@@ -69,8 +78,10 @@ footer {
 
 header {
 	display: flex;
+	flex-direction: column;
 	justify-content: space-between;
 	align-items: center;
+	gap: 1rem;
 }
 
 main {
@@ -78,6 +89,8 @@ main {
 	display: flex;
 	flex-direction: column;
 	justify-content: stretch;
+
+	position: relative;
 
 	.content {
 		flex: 1;
@@ -94,8 +107,9 @@ main {
 .btn {
 	background-color: #333;
 	color: #fff;
+	font-size: clamp(1.6rem, 2vw, 2rem);
 	border: none;
-	padding: 1rem 2rem;
+	padding: 0.75rem 1.5rem;
 	border-radius: 0.4rem;
 	cursor: pointer;
 	transition: all 0.2s ease;
@@ -119,7 +133,7 @@ main {
 }
 
 .card {
-	padding: 1rem;
+	padding: 2rem 4rem;
 	background-color: #fff;
 	background-color: rgba(255, 245, 238, 1);
 	border-bottom: 0.2rem solid rgba(0, 0, 0, 0.1);
@@ -130,6 +144,8 @@ main {
 	display: flex;
 	gap: 1.6rem;
 	align-items: center;
+
+	transition: all 0.3s ease-in;
 
 	.card__img {
 		width: 10rem;
@@ -144,12 +160,59 @@ main {
 	}
 
 	.card__content h2 {
-		font-size: 2rem;
 		color: #0a3e1a;
 	}
 }
 
+.card.card--loading {
+	filter: blur(0.5rem);
+	background-color: rgba(255, 245, 238, 0.5);
+}
+
+.snackbar {
+	position: fixed;
+	opacity: 0;
+	width: 100%;
+	transform: translateY(0);
+	background-color: #444;
+	color: gold;
+	text-align: center;
+	padding: 2rem;
+	position: fixed;
+	z-index: 1;
+	bottom: 0;
+	transition: transform 1s ease-in-out, opacity 500ms ease;
+	border-top: 0.1rem solid #777;
+
+	.snackbar-content p {
+		margin: 0;
+		font-size: 1.4rem;
+	}
+}
+
+.error {
+	color: coral;
+}
+
+.snackbar.show {
+	opacity: 1;
+	transform: translateY(-8%);
+}
+
+.btn--disabled {
+	background-color: #aaa;
+	color: #fff;
+	cursor: not-allowed;
+}
+
 @media only screen and (min-width: 45rem) {
+	header {
+		display: flex;
+		flex-direction: unset;
+		justify-content: space-between;
+		align-items: center;
+	}
+
 	main {
 		margin: 0 auto;
 		padding: 2rem 0;
@@ -160,6 +223,10 @@ main {
 		}
 	}
 
+	.btn {
+		padding: 1rem 2rem;
+	}
+
 	.card {
 		padding: 2rem;
 		margin-bottom: 2rem;
@@ -167,5 +234,32 @@ main {
 			rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
 		border: 0.2rem solid rgb(240, 240, 240, 1);
 		border-radius: 0.4rem;
+	}
+
+	.snackbar {
+		opacity: 0;
+		width: initial;
+		min-width: 50rem;
+		margin-left: -25rem;
+		transform: translateY(0);
+		background-color: #444;
+		color: gold;
+		text-align: center;
+		border-radius: 0.2rem;
+		padding: 2rem;
+		position: fixed;
+		z-index: 1;
+		left: 50%;
+		bottom: 3rem;
+		transition: transform 1s ease-in-out, opacity 500ms ease;
+
+		.snackbar-content p {
+			margin: 0;
+		}
+	}
+
+	.snackbar.show {
+		opacity: 1;
+		transform: translateY(-100%);
 	}
 }

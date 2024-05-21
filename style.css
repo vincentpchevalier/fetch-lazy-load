@@ -159,6 +159,7 @@ main {
 }
 
 .snackbar {
+	position: fixed;
 	opacity: 0;
 	width: 100%;
 	transform: translateY(0);

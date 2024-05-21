@@ -12,15 +12,6 @@ const footer = document.querySelector('footer');
 function init() {
 	console.log('App initialized, fetching users...');
 
-	// setTimeout(() => {
-	// 	document.querySelector('.snackbar').classList.add('show');
-	// 	console.log('showing snackbar');
-	// 	setTimeout(() => {
-	// 		document.querySelector('.snackbar').classList.remove('show');
-	// 		console.log('hiding snackbar');
-	// 	}, 5000);
-	// }, 2000);
-
 	// Intersection Observer API - setup footer observer
 	const options = {
 		root: null,
@@ -72,7 +63,6 @@ async function fetchUsers(size = 20) {
 		userData.push(...users);
 	} catch (err) {
 		if (err instanceof NetworkError) {
-			console.log(userData.length);
 			if (userData.length === 0) showSnackbar(err.message);
 		} else {
 			showSnackbar('An error occurred. Please try again.');
